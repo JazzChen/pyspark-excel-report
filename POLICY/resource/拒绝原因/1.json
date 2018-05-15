@@ -1,0 +1,6 @@
+{
+  "title": "芝麻分",
+  "index": ["types", "ts", "dimension"],
+  "index_name": "分段",
+  "sql": "select 1"
+}
