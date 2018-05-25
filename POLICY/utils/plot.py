@@ -103,7 +103,15 @@ def plot_table(ws, df, start_cell, title, index_name=u'时间'):
     # plot table header
     start_row, start_column = coordinate_to_tuple(start_cell)
     
-    if (len(df.index.names) == 2):
+    if (len(df.index.names) == 1):
+       # plot columns
+       i = 0
+       for column_name in df.columns:
+           column_cell = ws[tuple_to_coordinate(start_row, start_column+i)]
+           cell_range = '%s:%s' % (column_cell.coordinate, column_cell.coordinate)
+           set_header(ws, cell_range, name=column_name, merged=False)
+           i = i + 1
+    elif (len(df.index.names) == 2):
         # plot index column
         index_cell = ws[tuple_to_coordinate(start_row+1, start_column)]
         cell_range = '%s:%s' % (index_cell.coordinate, index_cell.coordinate)
@@ -148,7 +156,24 @@ def plot_table(ws, df, start_cell, title, index_name=u'时间'):
             top_column_column = top_column_column + second_column_size
     
     # plot body
-    if (len(df.index.names) == 2):
+    if (len(df.index.names) == 1):
+        # set body style
+        value_row = start_row + 1
+        value_column = start_column
+       
+        for i in range(0, df.shape[0]):
+            s = df.loc[i]
+            j = 0
+            for d in df.columns:
+                v = s.get(d)
+                value_cell = ws[tuple_to_coordinate(value_row+i, value_column+j)]
+                value_cell_range = '%s:%s' % (value_cell.coordinate, value_cell.coordinate)
+                set_body(ws, value_cell_range)
+                value_cell.value = v
+                if isinstance(value_cell.value, np.float64):
+                    value_cell.number_format = numbers.FORMAT_NUMBER
+                j = j + 1
+    elif (len(df.index.names) == 2):
         write_date = True
         index_row = start_row + 2
         index_column = start_column
